@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>A3</title>
+        <script type="text/javascript" src="d3.v5.min.js"></script>
+        <script type="text/javascript" src="numeric.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */		
+		</style>
+	</head>
+	<body>
+	 
+		<script type="text/javascript">
+		
+			var width = 800;
+			var height = 500;
+			
+			var dataset;
+			var coordinates;
+			
+			//Read the data
+			d3.csv("Country_List.csv").then(function(data) { 				
+				dataset = data; 					
+				generateVisualization(); 
+			});	
+            
+
+			function generateVisualization(){
+				
+                // console.log(dataset[0].Latitude);
+
+                var points = new Array(dataset.length);
+				
+                // Save lat/long data in 2D points array
+				for (var x=0; x < dataset.length; x = x + 1) {
+                    
+                    points[x] = [+dataset[x].Latitude, +dataset[x].Longitude, dataset[x].Alpha3];
+                    //points[x] = [+dataset[x].Longitude, +dataset[x].Latitude, dataset[x].Alpha3];
+					
+					
+				}
+                //console.log(points);
+
+                // find max/min width/height
+                var minH = Infinity;
+                var minW = Infinity;
+                var maxH = -Infinity;
+                var maxW = -Infinity;
+                for (var i=0; i< points.length; i++) {
+                    if (points[i][1] < minW) {
+                        minW = points[i][1];
+                    }
+                    if (points[i][1] > maxW) {
+                        maxW = points[i][1];
+                    }
+                    if (points[i][0] < minH) {
+                        minH = points[i][0];
+                    }
+                    if (points[i][0] > maxH) {
+                        maxH = points[i][0];
+                    }
+                }
+                console.log(minH);
+                console.log(maxH);
+                console.log(minW);
+                console.log(maxW);
+				
+                //create svg element
+                var svg = d3.select("body")
+							.append("svg")
+							.attr("width", width) 
+							.attr("height", height);
+
+
+                var xScale = d3.scaleLinear()
+                    .domain([minW, maxW])
+                    .range([100, width]);
+
+                var yScale = d3.scaleLinear()
+                    .domain([minH, maxH])
+                    .range([height, 10]);
+
+				
+                function colourScale(value) {
+                    var minVal = 0.001;
+                    //var maxVal = 7816278.1;
+                    var maxVal = 15000;
+                    var r = maxVal - minVal;
+
+                    
+                    return value / r;
+                }
+                    
+
+                
+                // Now draw the lines
+
+                d3.csv("gemstone15.csv").then(function(da) {
+                dataset2 = da;
+                //console.log(dataset2);
+                
+                var from_to = new Array(dataset2.length);
+				
+                // Save countries in list [0]=exporter, [1]=importer, [2]=value
+				for (var x=0; x < dataset2.length; x = x + 1) {
+                    from_to[x] = [dataset2[x].Exporter, dataset2[x].Importer, dataset2[x].Value];
+				}
+                console.log(from_to);
+
+
+                //var countries = {'ALB': [10,15], 'DZA': [30,5]};
+                var countries = {};
+
+                console.log(points);
+                //console.log(nodes.ALB[0]);
+
+                for (var i=0; i<points.length; i++) {
+                    countries[points[i][2]] = [points[i][0],points[i][1]];
+                }
+
+                //console.log(countries[points[1][2]]);
+
+
+
+                // console.log(points[0][2]);
+                // console.log(from_to[0][1]);
+
+                // make array with list of points
+                for (var t=0; t< from_to.length; t++) {
+                    var from = from_to[t][0];
+                    var to = from_to[t][1];
+
+                    var fromX = xScale(countries[from][1]);
+                    var fromY = yScale(countries[from][0]);
+                    var toX = xScale(countries[to][1]);
+                    var toY = yScale(countries[to][0]);
+
+
+                    svg.append('line')
+                        .attr('x1', fromX)
+                        .attr('y1', fromY)
+                        .attr('x2', toX)
+                        .attr('y2', toY)
+                        .attr('stroke', 'blue')
+                        .style("opacity", colourScale(from_to[t][2]));
+                    
+                    
+                    
+                }
+
+                svg.selectAll("circle").data(points).enter()
+                    .append("circle")
+                    .attr("cx", function(d) {
+                        return xScale(d[1]);
+                        //return d[1];
+                    })
+                    .attr("cy", function(d) {
+                        return yScale(d[0]);
+                        //return d[0];
+                    })
+                    .attr("r", 3)
+                    .attr("stroke-width", 1)
+                    .attr("fill", "red");
+
+            
+
+
+
+            });
+				
+			}				
+	
+			
+		</script>
+	</body>
+</html>
