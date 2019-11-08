@@ -31,14 +31,14 @@
                 // console.log(dataset[0].Latitude);
 
                 var points = new Array(dataset.length);
-				
+
                 // Save lat/long data in 2D points array
 				for (var x=0; x < dataset.length; x = x + 1) {
-                    
+
                     points[x] = [+dataset[x].Latitude, +dataset[x].Longitude, dataset[x].Alpha3];
                     //points[x] = [+dataset[x].Longitude, +dataset[x].Latitude, dataset[x].Alpha3];
-					
-					
+
+
 				}
                 //console.log(points);
 
@@ -85,7 +85,9 @@
                 function colourScale(value) {
                     var minVal = 0.001;
                     //var maxVal = 7816278.1;
-                    var maxVal = 15000;
+                    var maxVal
+
+                    = 15000;
                     var r = maxVal - minVal;
 
                     
@@ -106,22 +108,60 @@
 				for (var x=0; x < dataset2.length; x = x + 1) {
                     from_to[x] = [dataset2[x].Exporter, dataset2[x].Importer, dataset2[x].Value];
 				}
-                console.log(from_to);
+                console.log(from_to[0][1]); //Afg
 
+            // jp
+                var export_to = {}
 
+                // export_to = {[from_to[0][1]] : ['values']}
+                // export_to = {[from_to[0][1]] : [].concat("sdf")}
+                // export_to[from_to[0][1]] = new Array()
+                // export_to[from_to[0][1]].push("testvalues")
+                // export_to[from_to[0][1]] = append("testjj")
+                // export_to.jj.append("test12312")
+                // export_to[from_to[0][1]].push("test2")
+                // export_to[from_to[0][1]] = new Array()
+                // export_to[from_to[1][1]] = new Array()
+                // export_to[from_to[1][1]].push("testvalues")
+                // export_to[from_to[1][1]].push("test2")
+
+                // console.log(from_to)
+                // for(var i=0; i < from_to.length; i++)
+                // {
+
+                //     var c = from_to[i][0];
+
+                //     // export_to[c] = new Array();
+
+                //     export_to.from_to[i][0] = from[i][1]
+
+                // }
+
+///////////////end jp
                 //var countries = {'ALB': [10,15], 'DZA': [30,5]};
+
                 var countries = {};
 
-                console.log(points);
+                // console.log(points);
                 //console.log(nodes.ALB[0]);
 
                 for (var i=0; i<points.length; i++) {
                     countries[points[i][2]] = [points[i][0],points[i][1]];
                 }
 
-                //console.log(countries[points[1][2]]);
+// jp
+                // var export_to = {"AFG": ["CHN","ARG","BRZ"],"CND": ["BGB","AFG","AMR"]};
+                // console.log(export_to["AFG"].length)
+
+                // var c_name = "AFG";
+
+                // var new_points = new Array(export_to[c_name].length);
+                // var c_names = Object.keys(export_to) //get all the key names in dict export_to
+                // console.log(c_names)
 
 
+
+                ///////////////////////////////////////////////jp end
 
                 // console.log(points[0][2]);
                 // console.log(from_to[0][1]);
@@ -137,7 +177,7 @@
                     var toY = yScale(countries[to][0]);
 
 
-                    svg.append('line')
+                  var myline =  svg.append('line')
                         .attr('x1', fromX)
                         .attr('y1', fromY)
                         .attr('x2', toX)
@@ -145,10 +185,10 @@
                         .attr('stroke', 'blue')
                         .style("opacity", colourScale(from_to[t][2]));
                     
-                    
+
                     
                 }
-
+                console.log(from_to[0])
                 svg.selectAll("circle").data(points).enter()
                     .append("circle")
                     .attr("cx", function(d) {
@@ -161,13 +201,80 @@
                     })
                     .attr("r", 3)
                     .attr("stroke-width", 1)
-                    .attr("fill", "red");
+                    .attr("fill", "red").on("click", function(d){
+                       var selected_c = d[2]
+                       var mylist = new Array()
+                       for(var i =0; i < from_to.length; i ++)
+                       {
+                            if(from_to[i][0] == selected_c)
+                            {
+                                 mylist.push(from_to[i][1])
+                            }
+                       }
+                        console.log(mylist)
 
-            
+                        drawCirlces(mylist,selected_c, countries)
 
+                        // updateLines(countries, d)
+                    });
 
 
             });
+
+            function drawCirlces(mylist, selected_c, countries)
+            {
+                var new_points = new Array(mylist.length +1);
+                new_points[0] = [countries[selected_c][0], countries[selected_c][1], selected_c]
+                for (var x=0; x < mylist.length; x = x + 1) {
+                        var c = mylist[x]
+                        new_points[x+1] = [countries[c][0], countries[c][1], c];
+                        //points[x] = [+dataset[x].Longitude, +dataset[x].Latitude, dataset[x].Alpha3];
+
+
+                    }
+
+                    svg.selectAll("circle").data(new_points).enter()
+                    .append("circle")
+                    .attr("cx", function(d) {
+                        return xScale(d[1]);
+                        //return d[1];
+                    })
+                    .attr("cy", function(d) {
+                        return yScale(d[0]);
+                        //return d[0];
+                    })
+                    .attr("r", 3)
+                    .attr("stroke-width", 1)
+                    .attr("fill", "red")
+
+                console.log(new_points)
+            }
+
+            function updateLines(countries, current)
+            {
+                // var export_to = {"AFG": ["CHN","ARG","BRZ"],"CND": ["BGB","AFG","AMR"]};
+                // console.log(export_to["AFG"].length)
+
+                // var c_name = "AFG";
+
+                // var new_points = new Array(export_to[c_name].length);
+                // var c_names = Object.keys(export_to) //get all the key names in dict export_to
+                // console.log(countries["AFG"])
+                //   console.log(export_to["AFG"].length)
+
+                // // Save lat/long data in 2D points array
+                // for(y=0; y < c_names.length; y++)
+                // {
+                //     for (var x=0; x < export_to[c_names[y]].length; x = x + 1) {
+                //         var c = c_names[x];
+                //         // new_points[x] = [countries[c][0], countries[c][1], c];
+                //         //points[x] = [+dataset[x].Longitude, +dataset[x].Latitude, dataset[x].Alpha3];
+
+
+                //     }}
+
+                // console.log(line.exit().remove());
+            }
 				
 			}				
 	
