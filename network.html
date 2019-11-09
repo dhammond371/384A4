@@ -1,173 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>A3</title>
-        <script type="text/javascript" src="d3.v5.min.js"></script>
-        <script type="text/javascript" src="numeric.js"></script>
-		<style type="text/css">
-			/* No style rules here yet */		
-		</style>
-	</head>
-	<body>
-	 
-		<script type="text/javascript">
-		
-			var width = 800;
-			var height = 500;
-			
-			var dataset;
-			var coordinates;
-			
-			//Read the data
-			d3.csv("Country_List.csv").then(function(data) { 				
-				dataset = data; 					
-				generateVisualization(); 
-			});	
-            
 
-			function generateVisualization(){
-				
-                // console.log(dataset[0].Latitude);
+<head>
+    <meta charset="utf-8">
+    <title>A3</title>
+    <script type="text/javascript" src="d3.v5.min.js"></script>
+    <script type="text/javascript" src="numeric.js"></script>
+    <style type="text/css">
+        /* No style rules here yet */
+    </style>
+</head>
 
-                var points = new Array(dataset.length);
+<body>
 
-                // Save lat/long data in 2D points array
-				for (var x=0; x < dataset.length; x = x + 1) {
+    <script type="text/javascript">
 
-                    points[x] = [+dataset[x].Latitude, +dataset[x].Longitude, dataset[x].Alpha3];
-                    //points[x] = [+dataset[x].Longitude, +dataset[x].Latitude, dataset[x].Alpha3];
+        var width = 800;
+        var height = 500;
+
+        var dataset;
+        var coordinates;
+
+        //Read the data
+        d3.csv("Country_List.csv").then(function (data) {
+            dataset = data;
+            generateVisualization();
+        });
 
 
-				}
-                //console.log(points);
+        function generateVisualization() {
 
-                // find max/min width/height
-                var minH = Infinity;
-                var minW = Infinity;
-                var maxH = -Infinity;
-                var maxW = -Infinity;
-                for (var i=0; i< points.length; i++) {
-                    if (points[i][1] < minW) {
-                        minW = points[i][1];
-                    }
-                    if (points[i][1] > maxW) {
-                        maxW = points[i][1];
-                    }
-                    if (points[i][0] < minH) {
-                        minH = points[i][0];
-                    }
-                    if (points[i][0] > maxH) {
-                        maxH = points[i][0];
-                    }
+            // console.log(dataset[0].Latitude);
+
+            var points = new Array(dataset.length);
+
+            // Save lat/long data in 2D points array
+            for (var x = 0; x < dataset.length; x = x + 1) {
+
+                points[x] = [+dataset[x].Latitude, +dataset[x].Longitude, dataset[x].Alpha3];
+                //points[x] = [+dataset[x].Longitude, +dataset[x].Latitude, dataset[x].Alpha3];
+
+
+            }
+            //console.log(points);
+
+            // find max/min width/height
+            var minH = Infinity;
+            var minW = Infinity;
+            var maxH = -Infinity;
+            var maxW = -Infinity;
+            for (var i = 0; i < points.length; i++) {
+                if (points[i][1] < minW) {
+                    minW = points[i][1];
                 }
-                console.log(minH);
-                console.log(maxH);
-                console.log(minW);
-                console.log(maxW);
-				
-                //create svg element
-                var svg = d3.select("body")
-							.append("svg")
-							.attr("width", width) 
-							.attr("height", height);
+                if (points[i][1] > maxW) {
+                    maxW = points[i][1];
+                }
+                if (points[i][0] < minH) {
+                    minH = points[i][0];
+                }
+                if (points[i][0] > maxH) {
+                    maxH = points[i][0];
+                }
+            }
+            console.log(minH);
+            console.log(maxH);
+            console.log(minW);
+            console.log(maxW);
+
+            //create svg element
+            var svg = d3.select("body")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
 
 
-                var xScale = d3.scaleLinear()
-                    .domain([minW, maxW])
-                    .range([100, width]);
+            var xScale = d3.scaleLinear()
+                .domain([minW, maxW])
+                .range([100, width]);
 
-                var yScale = d3.scaleLinear()
-                    .domain([minH, maxH])
-                    .range([height, 10]);
+            var yScale = d3.scaleLinear()
+                .domain([minH, maxH])
+                .range([height, 10]);
 
-				
-                function colourScale(value) {
-                    var minVal = 0.001;
-                    //var maxVal = 7816278.1;
-                    var maxVal
+
+            function colourScale(value) {
+                var minVal = 0.001;
+                //var maxVal = 7816278.1;
+                var maxVal
 
                     = 15000;
-                    var r = maxVal - minVal;
+                var r = maxVal - minVal;
 
-                    
-                    return value / r;
-                }
-                    
 
-                
-                // Now draw the lines
+                return value / r;
+            }
 
-                d3.csv("gemstone15.csv").then(function(da) {
+
+
+            // Now draw the lines
+
+            d3.csv("gemstone15.csv").then(function (da) {
                 dataset2 = da;
                 //console.log(dataset2);
-                
+
                 var from_to = new Array(dataset2.length);
-				
+
                 // Save countries in list [0]=exporter, [1]=importer, [2]=value
-				for (var x=0; x < dataset2.length; x = x + 1) {
+                for (var x = 0; x < dataset2.length; x = x + 1) {
                     from_to[x] = [dataset2[x].Exporter, dataset2[x].Importer, dataset2[x].Value];
-				}
-                console.log(from_to[0][1]); //Afg
+                }
 
-            // jp
-                var export_to = {}
 
-                // export_to = {[from_to[0][1]] : ['values']}
-                // export_to = {[from_to[0][1]] : [].concat("sdf")}
-                // export_to[from_to[0][1]] = new Array()
-                // export_to[from_to[0][1]].push("testvalues")
-                // export_to[from_to[0][1]] = append("testjj")
-                // export_to.jj.append("test12312")
-                // export_to[from_to[0][1]].push("test2")
-                // export_to[from_to[0][1]] = new Array()
-                // export_to[from_to[1][1]] = new Array()
-                // export_to[from_to[1][1]].push("testvalues")
-                // export_to[from_to[1][1]].push("test2")
-
-                // console.log(from_to)
-                // for(var i=0; i < from_to.length; i++)
-                // {
-
-                //     var c = from_to[i][0];
-
-                //     // export_to[c] = new Array();
-
-                //     export_to.from_to[i][0] = from[i][1]
-
-                // }
-
-///////////////end jp
-                //var countries = {'ALB': [10,15], 'DZA': [30,5]};
-
-                var countries = {};
 
                 // console.log(points);
                 //console.log(nodes.ALB[0]);
-
-                for (var i=0; i<points.length; i++) {
-                    countries[points[i][2]] = [points[i][0],points[i][1]];
+                // Save Country Name as key and Lat. Long. as list values
+                var countries = {};
+                for (var i = 0; i < points.length; i++) {
+                    countries[points[i][2]] = [points[i][0], points[i][1]];
                 }
-
-// jp
-                // var export_to = {"AFG": ["CHN","ARG","BRZ"],"CND": ["BGB","AFG","AMR"]};
-                // console.log(export_to["AFG"].length)
-
-                // var c_name = "AFG";
-
-                // var new_points = new Array(export_to[c_name].length);
-                // var c_names = Object.keys(export_to) //get all the key names in dict export_to
-                // console.log(c_names)
-
-
-
-                ///////////////////////////////////////////////jp end
 
                 // console.log(points[0][2]);
                 // console.log(from_to[0][1]);
 
                 // make array with list of points
-                for (var t=0; t< from_to.length; t++) {
+                for (var t = 0; t < from_to.length; t++) {
                     var from = from_to[t][0];
                     var to = from_to[t][1];
 
@@ -177,69 +135,83 @@
                     var toY = yScale(countries[to][0]);
 
 
-                  var myline =  svg.append('line')
+                    var myline = svg.append('line')
                         .attr('x1', fromX)
                         .attr('y1', fromY)
                         .attr('x2', toX)
                         .attr('y2', toY)
                         .attr('stroke', 'blue')
                         .style("opacity", colourScale(from_to[t][2]));
-                    
-
-                    
                 }
-                console.log(from_to[0])
-                svg.selectAll("circle").data(points).enter()
-                    .append("circle")
-                    .attr("cx", function(d) {
-                        return xScale(d[1]);
-                        //return d[1];
-                    })
-                    .attr("cy", function(d) {
-                        return yScale(d[0]);
-                        //return d[0];
-                    })
-                    .attr("r", 3)
-                    .attr("stroke-width", 1)
-                    .attr("fill", "red").on("click", function(d){
-                       var selected_c = d[2]
-                       var mylist = new Array()
-                       for(var i =0; i < from_to.length; i ++)
-                       {
-                            if(from_to[i][0] == selected_c)
-                            {
-                                 mylist.push(from_to[i][1])
+
+
+                drawCirlces(points, svg)
+                // var istrue = true
+                // When a cirlce is clicked on
+                svg.selectAll("circle")
+                    .on("click", function (d) {
+
+                        console.log("click")
+                        console.log("selected cirlce")
+                        console.log(d);
+
+                        // if(istrue)
+                        // {istrue = false
+                        //d[2] is name of country of selected circle
+                        var selected_c = d[2]
+                        var export_to = new Array()
+
+                        // Get all the contries that selected country (selected_c) is exporting to and save them in export_to list
+                        for (var i = 0; i < from_to.length; i++) {
+                            if (from_to[i][0] == selected_c) {
+                                export_to.push(from_to[i][1])
                             }
-                       }
-                        console.log(mylist)
+                        }
 
-                        drawCirlces(mylist,selected_c, countries)
+                        if (export_to.length < 1) {
 
-                        // updateLines(countries, d)
-                    });
+                            console.log("things not looking g")
+                            console.log(export_to.length)
+                        }
+
+                        // create a new_points array which saves the name, lat., long of countries that selected country is exporting to
+                        if (export_to.length < 1) {
+                            var new_points = new Array()
+                            new_points.push([countries[selected_c][0], countries[selected_c][1], selected_c])
+                        }else{
+                            var new_points = new Array(export_to.length + 1);
+                            new_points[0] = [countries[selected_c][0], countries[selected_c][1], selected_c]
+                            for (var x = 0; x < export_to.length; x = x + 1) {
+                                var c = export_to[x]
+                                new_points[x + 1] = [countries[c][0], countries[c][1], c];
+                                //points[x] = [+dataset[x].Longitude, +dataset[x].Latitude, dataset[x].Alpha3];
+
+                            }
+                        }
+                        // console.log("newpoints ")
+                        // console.log(new_points)
+
+                        // draw new cirlces based on countries in new_points
+                        drawCirlces(new_points, svg)
+                    // }
+                });
 
 
             });
 
-            function drawCirlces(mylist, selected_c, countries)
-            {
-                var new_points = new Array(mylist.length +1);
-                new_points[0] = [countries[selected_c][0], countries[selected_c][1], selected_c]
-                for (var x=0; x < mylist.length; x = x + 1) {
-                        var c = mylist[x]
-                        new_points[x+1] = [countries[c][0], countries[c][1], c];
-                        //points[x] = [+dataset[x].Longitude, +dataset[x].Latitude, dataset[x].Alpha3];
+            function drawCirlces(newdata, svg) {
+                console.log("ppints in drwc test")
+                // console.log(newdata)
+                const circles = svg.selectAll("circle").data(newdata)
 
-
-                    }
-
-                    svg.selectAll("circle").data(new_points).enter()
+                svg.selectAll("circle").data(newdata)
+                    .enter()
                     .append("circle")
-                    .attr("cx", function(d) {
+                    .attr("cx", function (d) {
                         return xScale(d[1]);
                         //return d[1];
                     })
-                    .attr("cy", function(d) {
+                    .attr("cy", function (d) {
                         return yScale(d[0]);
                         //return d[0];
                     })
@@ -247,11 +219,45 @@
                     .attr("stroke-width", 1)
                     .attr("fill", "red")
 
-                console.log(new_points)
+
+                circles.exit().transition()
+                    .attr('r', 0).remove()
             }
 
-            function updateLines(countries, current)
-            {
+
+            // TO REMOVE
+            // function drawCirlces(mylist, selected_c, countries, circles)
+            // {
+            //     var new_points = new Array(mylist.length +1);
+            //     new_points[0] = [countries[selected_c][0], countries[selected_c][1], selected_c]
+            //     for (var x=0; x < mylist.length; x = x + 1) {
+            //             var c = mylist[x]
+            //             new_points[x+1] = [countries[c][0], countries[c][1], c];
+            //             //points[x] = [+dataset[x].Longitude, +dataset[x].Latitude, dataset[x].Alpha3];
+
+            //         }
+
+            //         circle = svg
+            //     .selectAll('circle')
+            //     .data(data);
+            //         circles
+            //     .exit()
+            //     .transition()
+            //     .attr('r', 0)
+            //     .remove();
+
+            //         // svg.selectAll("circle").data(new_points).enter()
+            //         // .append("circle")
+            //         // .attr("cx", new_points[1])
+            //         // .attr("cy", new_points[0])
+            //         // .attr("r", 3)
+            //         // .attr("stroke-width", 1)
+            //         // .attr("fill", "red")
+
+            //     console.log(new_points)
+            // }
+
+            function updateLines(countries, current) {
                 // var export_to = {"AFG": ["CHN","ARG","BRZ"],"CND": ["BGB","AFG","AMR"]};
                 // console.log(export_to["AFG"].length)
 
@@ -275,10 +281,11 @@
 
                 // console.log(line.exit().remove());
             }
-				
-			}				
-	
-			
-		</script>
-	</body>
+
+        }
+
+
+    </script>
+</body>
+
 </html>
